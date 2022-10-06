@@ -373,7 +373,7 @@ class TypeWrapper: public DynamicResourceTypeMap<Self>,
   //     // but one of its fields is the wrong type, tryUnwrap() will throw a TypeError. The idea
   //     // here is that `tryUnwrap()` should only do the amount of type checking that one would
   //     // typically do in JavaScript to distinguish a variant type (e.g. "string or number").
-  //     // Typically this is limited to what you can do with the `typeof` and `instanceof`
+  //     // Typically, this is limited to what you can do with the `typeof` and `instanceof`
   //     // keywords on the top-level value.
   //
   // Note the `dummy` parameters of type T*. These will always be passed `nullptr`. The purpose of

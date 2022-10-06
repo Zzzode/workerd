@@ -626,8 +626,8 @@ public:
 
 template <typename TypeWrapper>
 class DynamicResourceTypeMap {
-  // TypeWrapper must list this type as its first superclass. The ResourceWrappers that it
-  // subclasses will then be able to regsiter themselves in the map.
+  // TypeWrapper must list this type as its first superclass. The ResourceWrappers that its
+  // subclasses will then be able to register themselves in the map.
 
 private:
   typedef void ReflectionInitializer(jsg::Object& object, TypeWrapper& wrapper);

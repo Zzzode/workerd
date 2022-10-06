@@ -289,7 +289,7 @@ public:
   jsg::Promise<jsg::Value> json(jsg::Lock& js);
   jsg::Promise<jsg::Ref<Blob>> blob(jsg::Lock& js);
 
-  JSG_RESOURCE_TYPE(Body, CompatibilityFlags::Reader flags) {
+  JSG_RESOURCE_TYPE(Body, CompatibilityFlags::Reader flags)  {
     if (flags.getJsgPropertyOnPrototypeTemplate()) {
       JSG_READONLY_PROTOTYPE_PROPERTY(body, getBody);
       JSG_READONLY_PROTOTYPE_PROPERTY(bodyUsed, getBodyUsed);
@@ -426,7 +426,7 @@ private:
 };
 
 struct RequestInitializerDict {
-  // Type of the second parameter to Request's constructor. Also the type of the second parameter
+  // Type of the second parameter to Request's constructor. Also, the type of the second parameter
   // to fetch().
 
   jsg::Optional<kj::String> method;

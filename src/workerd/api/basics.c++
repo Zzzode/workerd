@@ -262,7 +262,7 @@ bool EventTarget::dispatchEventImpl(jsg::Lock& js, jsg::Ref<Event> event) {
   }
 
   const auto isRemoved = [&](auto& handler) {
-    // This is not the most efficient way to do this but it's what works right now.
+    // This is not the most efficient way to do this, but it's what works right now.
     // Instead of capturing direct references to the handler structs, we copy those
     // into the Callbacks vector, which means we need to look up the actual handler
     // again to see if it still exists in the list. The entire way the storage of the

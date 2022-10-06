@@ -12,6 +12,8 @@
 #include <kj/function.h>
 #include <kj/map.h>
 #include <workerd/io/io-context.h>
+
+#include <utility>
 #include "actor-state.h"
 
 namespace workerd::api {
@@ -32,12 +34,12 @@ public:
   explicit Event(kj::String ownType, Init init = Init(), bool trusted = true)
       : type(ownType),
         ownType(kj::mv(ownType)),
-        init(init),
+        init(kj::mv(init)),
         trusted(trusted) {}
 
   explicit Event(kj::StringPtr type, Init init = Init(), bool trusted = true)
       : type(type),
-        init(init),
+        init(kj::mv(init)),
         trusted(trusted) {}
 
   bool isPreventDefault() { return preventedDefault; }
@@ -54,7 +56,7 @@ public:
   void stopImmediatePropagation() { stopped = true; }
   void preventDefault() { preventedDefault = true; }
 
-  // The only phases we actually use are NONE and AT_TARGET but we provide
+  // The only phases we actually use are NONE and AT_TARGET, but we provide
   // all of them to meet spec compliance.
   enum Phase {
     NONE,
@@ -80,7 +82,7 @@ public:
   bool getReturnValue() { return !getDefaultPrevented(); }
 
   double getTimestamp() { return 0.0; }
-  // We provide the timeStamp property for spec compliance but we force
+  // We provide the timeStamp property for spec compliance, but we force
   // the value to 0.0 always because we really don't want users to rely
   // on this property for timing details.
 
@@ -303,8 +305,25 @@ public:
                            jsg::Optional<EventListenerOpts> options);
   bool dispatchEvent(jsg::Lock& js, jsg::Ref<Event> event);
 
-  JSG_RESOURCE_TYPE(EventTarget) {
-    JSG_METHOD(addEventListener);
+  static constexpr ::workerd::jsg::JsgKind JSG_KIND __attribute__((unused)) = ::workerd::jsg::JsgKind::RESOURCE;
+  using jsgSuper = jsgThis;
+  using jsgThis = EventTarget;
+  template<typename>
+  friend constexpr bool ::workerd::jsg::resourceNeedsGcTracing();
+  template<typename T>
+  friend void ::workerd::jsg::visitSubclassForGc(T *obj, ::workerd::jsg::GcVisitor &visitor);
+  inline void jsgVisitForGc(::workerd::jsg::GcVisitor &visitor)
+  override {
+    jsgSuper::jsgVisitForGc(visitor);
+    ::workerd::jsg::visitSubclassForGc<EventTarget>(this, visitor);
+  }
+  static void jsgConfiguration();
+  template<typename Registry, typename Self>
+  static void registerMembers(Registry &registry) {
+//    JSG_METHOD(addEventListener);
+    static const char NAME[] = "addEventListener";
+    registry.template registerMethod<NAME, decltype(&Self::addEventListener), &Self::addEventListener>();
+
     JSG_METHOD(removeEventListener);
     JSG_METHOD(dispatchEvent);
   }
@@ -335,7 +354,7 @@ private:
 
     using Handler = kj::OneOf<JavaScriptHandler, NativeHandlerRef>;
     // An EventHandler can be backed by either a JavaScript Handler (which is either a
-    // function or an object) or a native handler. The insertion order matters here so
+    // function or an object) or a native handler. The insertion order matters here, so
     // we maintain a single table.
 
     Handler handler;
@@ -432,7 +451,7 @@ private:
 
   bool warnOnHandlerReturn = true;
   // Event handlers are not supposed to return values. The first time one does, we'll
-  // emit a warning to help users debug things but we'll otherwise ignore it.
+  // emit a warning to help users debug things, but we'll otherwise ignore it.
 
   void visitForGc(jsg::GcVisitor& visitor);
 
